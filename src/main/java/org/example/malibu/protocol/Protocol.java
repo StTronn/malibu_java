@@ -1,6 +1,9 @@
 package org.example.malibu.protocol;
 
 import lombok.AllArgsConstructor;
+
+import java.util.Objects;
+
 import org.example.malibu.protocol.messages.ErrorMessage;
 import org.example.malibu.protocol.messages.Hello;
 import org.example.malibu.protocol.messages.Message;
@@ -26,6 +29,13 @@ public class Protocol {
     return processMessage(messageObj);
   }
 
+  public String sendMessage(Message message){
+    if(Objects.isNull(message)){
+      return "";
+    }
+    return mapper.marshall(message);
+  }
+
 
   public Message processMessage(Message message){
     try {
@@ -45,9 +55,6 @@ public class Protocol {
     }
   }
 
-  public String sendMessage(Message message){
-    return mapper.marshall(message);
-  }
 
   public Message sendHello(){
     return Hello.builder()
@@ -56,7 +63,7 @@ public class Protocol {
 
   private Message processHello(Message message){
     Hello hello = (Hello) message;
-    hello.isValid();
+    // hello.isValid();
     return hello;
   }
 

@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 
 import org.example.malibu.Peer.Host;
 import org.example.malibu.Peer.Peer;
+import org.example.malibu.Peer.PeerManager;
 import org.example.malibu.protocol.Protocol;
 
 import lombok.SneakyThrows;
@@ -25,15 +26,17 @@ public class Network {
   private final Map<String, Host> liveHosts = Host.getBootstrapServers().stream().collect(Collectors.toMap(Host::getKeyString, Function.identity()));
   private final int maxRetries = 3;
   private final ExecutorService executorService = Executors.newFixedThreadPool(10); // Adjust pool size as needed
-
+  private final PeerManager peerManager;
   public Network(Integer portNumber) throws IOException {
     this.socket = new ServerSocket(portNumber);
     protocol = new Protocol();
+    this.peerManager = new PeerManager(Host.getBootstrapServers());
   }
 
   Network() throws IOException {
     this.socket = new ServerSocket(18010);
     protocol = new Protocol();
+    this.peerManager = new PeerManager(Host.getBootstrapServers());
   }
 
   //TODO: add handling of defragmentation msgs
@@ -47,6 +50,7 @@ public class Network {
   private void handleClient(Socket clientSocket) {
     try {
       Peer peer = new Peer(new Host(clientSocket.getInetAddress().getHostAddress(), clientSocket.getPort()), clientSocket);
+      peerManager.addPeer(peer);
       // Add your client handling logic here
       // You can move your protocol communication code here
       
